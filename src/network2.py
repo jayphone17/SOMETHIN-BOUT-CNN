@@ -187,12 +187,12 @@ class Network(object):
             "weights": [w.tolist() for w in self.weights],
             "biases": [b.tolist() for b in self.biases],
             "cost": str(self.cost.__name__)}
-    f = open(filename,"w")
+    f = open("/Users/jayphone/Desktop/SOMETHIN-BOUT-CNN/fig","w")
     json.dump(data,f)
     f.close()
 
 def load(filename):
-  f = open(filename,"r")
+  f = open("/Users/jayphone/Desktop/SOMETHIN-BOUT-CNN/fig","r")
   data = json.load(f)
   f.close()
   cost = getattr(sys.modules[__name__],data["cost"])
