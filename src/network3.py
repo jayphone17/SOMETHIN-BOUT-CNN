@@ -69,3 +69,115 @@ class Network(object):
       )
     self.output = self.layers[-1].output
     self.output_dropout = self.layers[-1].output_dropout
+
+  def SGD(self,training_data, epochs, mini_batch_size, eta, validation_data,test_data, lmbda = 0.0):
+    # 使用小批量数据以及随机梯度下降训练网络
+    training_x,training_y = training_data
+    validation_x,validation_y = validation_data
+    test_x, test_y = test_data
+    # 计算小批量用于训练、验证以及测试
+    num_training_batches = size(training_data)/mini_batch_size
+    num_validation_batches = size(validation_data)/mini_batch_size
+    num_test_batches = size(test_data)/mini_batch_size
+
+    # 定义正则化的代价函数，以及梯度，更新
+    # L2正则化
+    l2_norm_squared = sum([(layer.w**2).sum() for layer in self.layers])
+    cost = self.layers[-1].cost(self)+\
+           0.5*lmbda*l2_norm_squared/num_training_batches
+    grads = T.grad(cost,self.params)
+    updates = [(param, param-eta*grad)
+               for param, grad in zip(self.params, grads)]
+
+    # 定义一个函数训练小批量，通过验证数据以及测试小批量计算准确率
+    # minibatch的索引
+    i = T.lscalar()
+    train_mb = theano.function(
+      [i],cost,updates = updates,
+      givens={
+        self.x:
+        training_x[i*self.mini_batch_size:(i+1)*self.mini_batch_size],
+        self.y:
+        training_x[i*self.mini_batch_size:(i+1)*self.mini_batch_size]
+      }
+    )
+    validate_mb_accuracy = theano.function(
+      [i], self.layers[-1].accuracy(self.y),
+      givens={
+        self.x:
+          validation_x[i * self.mini_batch_size: (i + 1) * self.mini_batch_size],
+        self.y:
+          validation_y[i * self.mini_batch_size: (i + 1) * self.mini_batch_size]
+      })
+    test_mb_accuracy = theano.function(
+      [i], self.layers[-1].accuracy(self.y),
+      givens={
+        self.x:
+          test_x[i * self.mini_batch_size: (i + 1) * self.mini_batch_size],
+        self.y:
+          test_y[i * self.mini_batch_size: (i + 1) * self.mini_batch_size]
+      })
+    self.test_mb_predictions = theano.function(
+      [i], self.layers[-1].y_out,
+      givens={
+        self.x:
+          test_x[i * self.mini_batch_size: (i + 1) * self.mini_batch_size]
+      })
+
+    # 进行真正的训练
+    base_validation_accuracy = 0.0
+    for epoch in xrange(epochs):
+      for minibatch_index in xrange(num_training_batches):
+        iteration  = num_validation_batches*epoch+minibatch_index
+        if iteration % 1000 ==0:
+          print("training mini-batch number {0}".format(iteration))
+        cost_ij = train_mb(minibatch_index)
+        if(iteration+1) % num_training_batches == 0:
+          validation_accuracy = np.mean(
+            [validate_mb_accuracy(j) for j in xrange(num_validation_batches)]
+          )
+          print("epoch {0} :validation accuracy {1:2%}".format(epoch,validation_accuracy))
+          if validation_accuracy >= best_validation_accuracy:
+            print("this is the best validation accuracy to data")
+            best_validation_accuracy = validation_accuracy
+            best_iteration = iteration
+            if test_data:
+              test_accuracy = np.mean(
+                [test_mb_accuracy[j] for j in xrange(num_test_batches)]
+              )
+              print("the corresponding test accuracy is {0:,2%}".format(test_accuracy))
+    print("finished training network")
+    print("best validation accuracy of {0:.2%} obtained at iteration {1}".format(best_validation_accuracy,best_iteration))
+    print("Corresponding test accuracy of {0:.2%}".format(test_accuracy))
+
+# 池化层
+class ConvPoolLayer(object):
+  def __init__(self, filtter_shape, image_shape, poolsize = (2,2),activation_fn = sigmoid):
+    print("")
+  def set_inpt(self, inpt, inpt_dropout, mini_batch_size):
+    print()
+
+# 全连接层
+class FullyConnectedLayer(object):
+  def __init__(self,n_in, n_out, activation_fn = sigmoid, p_dropout = 0.0):
+    print()
+  def set_inpt(self, inpt, inpt_dropout, mini_batch_size):
+    print()
+  def accuracy(self,y):
+    return T.mean(T.eq(y,self.y_out))
+
+# 柔性最大层
+class SoftmaxLayer(object):
+  def __init__(self, n_in, n_out, p_dropout = 0.0):
+    return
+  def set_inpt(self, inpt, inpt_dropout, mini_batch_size):
+    return
+  def cost(self,net):
+    return
+  def accuracy(self,y):
+    return
+
+def size(data):
+  return
+def dropout_layer(layer, p_dropout):
+  return
