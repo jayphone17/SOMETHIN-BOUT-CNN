@@ -29,7 +29,7 @@ from theano.tensor.nnet import sigmoid
 from theano.tensor import tanh
 
 # GPU模块
-GPU = True
+GPU = False
 if GPU:
   print("开始尝试使用GPU运行程序。如果不使用GPU则把上面GPU改成False。")
   try:theano.config.device = 'gpu'
@@ -150,34 +150,123 @@ class Network(object):
     print("best validation accuracy of {0:.2%} obtained at iteration {1}".format(best_validation_accuracy,best_iteration))
     print("Corresponding test accuracy of {0:.2%}".format(test_accuracy))
 
-# 池化层
+# 卷基层以及池化层
 class ConvPoolLayer(object):
   def __init__(self, filtter_shape, image_shape, poolsize = (2,2),activation_fn = sigmoid):
-    print("")
+    # filtter_shape是一个长度为4的元组
+    # 表示1.数字的个数、2.输入特征映射个数、3.滤波器的高度、4.滤光片的宽度。
+    # image_shape是一个长度为4的元组
+    # 表示1.小戳的大小、2.输入特征图数量、3.图像高度、4.图像宽度
+    # poolsize是一个长度为2的元组
+    # 表示x和y的卷积核大小。
+    self.filtter_shape = filtter_shape
+    self.image_shape = image_shape
+    self.poolsize = poolsize
+    self.activation_fn = activation_fn
+
+    # 初始化权重和偏置
+    n_out = (filtter_shape[0]*np.prod(filtter_shape[2:])/np.prod(poolsize))
+    self.w = theano.shared(
+      np.asarray(
+        np.random.normal(loc = 0, scale=np.sqrt(1.0 / n_out), size = filtter_shape),
+        dtype= theano.config.floatX,
+      ),
+      borrow=True
+    )
+    self.b = theano.shared(
+      np.adarray(
+        np.random.normal(loc = 0, scale=1.0, size = (filtter_shape[0],)),
+        dtype = theano.config.floatX,
+      ),
+    borrow = True
+    )
+    self.params = [self.w,self.b]
+
   def set_inpt(self, inpt, inpt_dropout, mini_batch_size):
-    print()
+    self.inpt = inpt.reshape(self.image_shape)
+    conv_out = conv.conv2d(
+      input = self.inpt, filters=self.w,filter_shape=self.filtter_shape,
+      image_shape=self.image_shape
+    )
+    pooled_out = downsample.max_pool_2d(
+      input = conv_out, ds = self.poolsize, ignore_border=True
+    )
+    self.output = self.activation_fn(
+      pooled_out + self.b.dimshuffle('x',0,'x','x')
+    )
+    self.output_dropout = self.output
 
 # 全连接层
 class FullyConnectedLayer(object):
-  def __init__(self,n_in, n_out, activation_fn = sigmoid, p_dropout = 0.0):
-    print()
+  def __init__(self, n_in, n_out, activation_fn=sigmoid, p_dropout=0.0):
+    self.n_in = n_in
+    self.n_out = n_out
+    self.activation_fn = activation_fn
+    self.p_dropout = p_dropout
+    # Initialize weights and biases
+    self.w = theano.shared(
+      np.asarray(
+        np.random.normal(
+          loc=0.0, scale=np.sqrt(1.0 / n_out), size=(n_in, n_out)),
+        dtype=theano.config.floatX),
+      name='w', borrow=True)
+    self.b = theano.shared(
+      np.asarray(np.random.normal(loc=0.0, scale=1.0, size=(n_out,)),
+                 dtype=theano.config.floatX),
+      name='b', borrow=True)
+    self.params = [self.w, self.b]
+
   def set_inpt(self, inpt, inpt_dropout, mini_batch_size):
-    print()
-  def accuracy(self,y):
-    return T.mean(T.eq(y,self.y_out))
+    self.inpt = inpt.reshape((mini_batch_size, self.n_in))
+    self.output = self.activation_fn(
+      (1 - self.p_dropout) * T.dot(self.inpt, self.w) + self.b)
+    self.y_out = T.argmax(self.output, axis=1)
+    self.inpt_dropout = dropout_layer(
+      inpt_dropout.reshape((mini_batch_size, self.n_in)), self.p_dropout)
+    self.output_dropout = self.activation_fn(
+      T.dot(self.inpt_dropout, self.w) + self.b)
+
+  def accuracy(self, y):
+    "Return the accuracy for the mini-batch."
+    return T.mean(T.eq(y, self.y_out))
 
 # 柔性最大层
 class SoftmaxLayer(object):
-  def __init__(self, n_in, n_out, p_dropout = 0.0):
-    return
+  def __init__(self, n_in, n_out, p_dropout=0.0):
+    self.n_in = n_in
+    self.n_out = n_out
+    self.p_dropout = p_dropout
+    # Initialize weights and biases
+    self.w = theano.shared(
+      np.zeros((n_in, n_out), dtype=theano.config.floatX),
+      name='w', borrow=True)
+    self.b = theano.shared(
+      np.zeros((n_out,), dtype=theano.config.floatX),
+      name='b', borrow=True)
+    self.params = [self.w, self.b]
+
   def set_inpt(self, inpt, inpt_dropout, mini_batch_size):
-    return
-  def cost(self,net):
-    return
-  def accuracy(self,y):
-    return
+    self.inpt = inpt.reshape((mini_batch_size, self.n_in))
+    self.output = softmax((1 - self.p_dropout) * T.dot(self.inpt, self.w) + self.b)
+    self.y_out = T.argmax(self.output, axis=1)
+    self.inpt_dropout = dropout_layer(
+      inpt_dropout.reshape((mini_batch_size, self.n_in)), self.p_dropout)
+    self.output_dropout = softmax(T.dot(self.inpt_dropout, self.w) + self.b)
+
+  def cost(self, net):
+    "Return the log-likelihood cost."
+    return -T.mean(T.log(self.output_dropout)[T.arange(net.y.shape[0]), net.y])
+
+  def accuracy(self, y):
+    "Return the accuracy for the mini-batch."
+    return T.mean(T.eq(y, self.y_out))
 
 def size(data):
-  return
+  return data[0].get_value(borrow = True).shape[0]
+
 def dropout_layer(layer, p_dropout):
-  return
+  srng = shared_randomstreams.RandomStreams(
+    np.random.RandomState(0).randint(999999)
+  )
+  mask = srng.binomial(n=1,p=1-p_dropout, size=layer.shape)
+  return layer*T.cast(mask,theano.config.floatX)
