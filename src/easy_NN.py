@@ -18,10 +18,9 @@ for epoch in range(epoch_n):
     h1 = x.mm(w1)
     h1 = h1.clamp(min = 0)
     y_pred = h1.mm(w2)
-
     loss = (y_pred - y).pow(2).sum()
     #均值方差损失函数
-    print("Epoch = {}, Loss:{:.4}".format(epoch,loss))
+    print("Epoch = {}, Loss:{:.4f}".format(epoch,loss))
 
     grad_y_pred = 2*(y_pred - y)
     grad_w2 = h1.t().mm(grad_y_pred)
