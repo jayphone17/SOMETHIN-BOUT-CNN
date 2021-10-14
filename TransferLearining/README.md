@@ -1,6 +1,6 @@
 挖坑中。。
 
-![](jayphone17/SOMETHIN-BOUT-CNN/fig/猫狗图片浏览.png)
+![](../fig/猫狗图片浏览.png)
 
 Kaggle上的
 
