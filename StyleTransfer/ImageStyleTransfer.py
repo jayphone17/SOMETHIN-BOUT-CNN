@@ -27,7 +27,7 @@ def loading(path = None):
     img = img.unsqueeze(0)
     return img
 
-content_img = loading("1111.jpg")
+content_img = loading("3333.jpg")
 content_img = Variable(content_img).cuda()
 style_img = loading("2222.jpg")
 style_img = Variable(style_img).cuda()
@@ -99,8 +99,8 @@ style_layer = ["Conv_1", "Conv_2", "Conv_3", "Conv_4"]
 content_losses = []
 style_losses = []
 
-content_weight = 1
-style_weight = 1000
+content_weight = 10000000
+style_weight = 10
 
 new_model = torch.nn.Sequential()
 model = copy.deepcopy(cnn)
@@ -119,17 +119,20 @@ for layer in list(model)[:8]:
     if isinstance(layer, torch.nn.Conv2d):
         name = "Conv_"+str(index)
         new_model.add_module(name,layer)
+
         if name in content_layer:
             target = new_model(content_img).clone()
-            content_loss = Content_loss(content_weight,target)
-            new_model.add_module("content_loss"+str(index), content_loss)
+            content_loss = Content_loss(content_weight, target)
+            new_model.add_module("content_loss_"+str(index), content_loss)
             content_losses.append(content_loss)
+
         if name in style_layer:
             target = new_model(style_img).clone()
             target = gram(target)
             style_loss = Style_loss(style_weight, target)
-            new_model.add_module("style_loss" + str(index), style_loss)
+            new_model.add_module("style_loss_" + str(index), style_loss)
             style_losses.append(style_loss)
+
     if isinstance(layer, torch.nn.ReLU):
         name = "Relu_"+str(index)
         new_model.add_module(name,layer)
@@ -144,7 +147,7 @@ input_img = content_img.clone()
 parameter = torch.nn.Parameter(input_img.data)
 optimizer = torch.optim.LBFGS([parameter])
 
-epoch_n = 300
+epoch_n = 500
 epoch = [0]
 
 while epoch[0] <= epoch_n:
@@ -155,32 +158,40 @@ while epoch[0] <= epoch_n:
         parameter.data.clamp_(0,1)
         new_model(parameter)
         for sl in style_losses:
-            style_score += sl.backward()
+            # style_score += sl.backward()
+            style_score += sl.loss
+
         for cl in content_losses:
-            content_score += cl.backward()
+            # content_score += cl.backward()
+            content_score += cl.loss
+
+        style_score *= style_weight
+        content_score *= content_weight
+        loss = style_score + content_score
+        loss.backward()
+
         epoch[0] += 1
         if epoch[0] % 50 == 0:
-            print("Epoch: {}".format(epoch[0]))
-            print("Style_Loss: {:.4f} Content_Loss: {:.4f}".format(style_score.item(), content_score.item()))
+            print('Epoch:{} Style_loss : {:4f} Content_loss : {:4f}'.format(epoch[0], style_score, content_score))
         return style_score + content_score
     optimizer.step(closure)
 
 
 #图片的输出
-# output = parameter.data
-# unloader = transforms.ToPILImage()  # reconvert into PIL image
-#
-# plt.ion()
-# plt.figure()
-# def imshow(tensor, title=None):
-#     image = tensor.clone().cpu()  # we clone the tensor to not do changes on it
-#     image = image.view(3, 224, 224)  # remove the fake batch dimension
-#     image = unloader(image)
-#     plt.imshow(image)
-#     if title is not None:
-#         plt.title(title)
-#     plt.pause(0.001) # pause a bit so that plots are updated
-# imshow(output, title='Output Image')
-# plt.ioff()
-# plt.show()
+output = parameter.data
+unloader = transforms.ToPILImage()  # reconvert into PIL image
+
+plt.ion()
+plt.figure()
+def imshow(tensor, title=None):
+    image = tensor.clone().cpu()  # we clone the tensor to not do changes on it
+    image = image.view(3, 224, 224)  # remove the fake batch dimension
+    image = unloader(image)
+    plt.imshow(image)
+    if title is not None:
+        plt.title(title)
+    plt.pause(0.001) # pause a bit so that plots are updated
+imshow(output, title='Output Image')
+plt.ioff()
+plt.show()
 
