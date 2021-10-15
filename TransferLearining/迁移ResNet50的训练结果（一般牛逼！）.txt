@@ -1,0 +1,55 @@
+C:\Users\JayphoneLin\anaconda3\envs\pytorch_study\python.exe C:/Users/JayphoneLin/Desktop/SOMETHIN-BOUT-CNN/TransferLearining/ResNet50-Model-Transfering.py
+Downloading: "https://download.pytorch.org/models/resnet50-19c8e357.pth" to C:\Users\JayphoneLin/.cache\torch\hub\checkpoints\resnet50-19c8e357.pth
+100%|██████████| 97.8M/97.8M [00:10<00:00, 10.0MB/s]
+Using GPU for training!!!!! 
+1
+NVIDIA GeForce RTX 2060
+Epoch 0/4
+--------------------------------------------------
+Training...
+Batch 500,TrainLoss: 0.5684,TrainAcc: 79.4500
+Batch 1000,TrainLoss: 0.4787,TrainAcc: 86.5750
+Batch 1500,TrainLoss: 0.4197,TrainAcc: 89.2667
+train Loss:0.4140 Acc:89.4760%
+Validating...
+valid Loss:0.2362 Acc:97.3600%
+Epoch 1/4
+--------------------------------------------------
+Training...
+Batch 500,TrainLoss: 0.2419,TrainAcc: 95.6125
+Batch 1000,TrainLoss: 0.2276,TrainAcc: 95.5125
+Batch 1500,TrainLoss: 0.2177,TrainAcc: 95.4250
+train Loss:0.2169 Acc:95.4120%
+Validating...
+valid Loss:0.1473 Acc:97.6000%
+Epoch 2/4
+--------------------------------------------------
+Training...
+Batch 500,TrainLoss: 0.1752,TrainAcc: 95.9125
+Batch 1000,TrainLoss: 0.1712,TrainAcc: 95.7688
+Batch 1500,TrainLoss: 0.1632,TrainAcc: 95.8458
+train Loss:0.1626 Acc:95.8240%
+Validating...
+valid Loss:0.1140 Acc:97.8400%
+Epoch 3/4
+--------------------------------------------------
+Training...
+Batch 500,TrainLoss: 0.1472,TrainAcc: 95.8375
+Batch 1000,TrainLoss: 0.1395,TrainAcc: 96.2000
+Batch 1500,TrainLoss: 0.1376,TrainAcc: 96.1375
+train Loss:0.1380 Acc:96.0880%
+Validating...
+valid Loss:0.0970 Acc:97.8600%
+Epoch 4/4
+--------------------------------------------------
+Training...
+Batch 500,TrainLoss: 0.1242,TrainAcc: 96.2875
+Batch 1000,TrainLoss: 0.1261,TrainAcc: 96.1625
+Batch 1500,TrainLoss: 0.1242,TrainAcc: 96.2417
+train Loss:0.1245 Acc:96.2160%
+Validating...
+valid Loss:0.0791 Acc:98.2800%
+941.1152875423431
+（总共用时15分钟）
+
+Process finished with exit code 0
