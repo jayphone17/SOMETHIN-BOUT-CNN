@@ -1,0 +1,52 @@
+Using GPU for training!!!!! 
+1
+NVIDIA GeForce RTX 2060
+Epoch 0/4
+--------------------------------------------------
+Training...
+Batch 500,TrainLoss: 0.1021,TrainAcc: 96.2625
+Batch 1000,TrainLoss: 0.0764,TrainAcc: 97.1750
+Batch 1500,TrainLoss: 0.0688,TrainAcc: 97.4500
+train Loss:0.0676 Acc:97.5000%
+Validating...
+valid Loss:0.0183 Acc:99.4800%
+Epoch 1/4
+--------------------------------------------------
+Training...
+Batch 500,TrainLoss: 0.0222,TrainAcc: 99.2500
+Batch 1000,TrainLoss: 0.0242,TrainAcc: 99.2063
+Batch 1500,TrainLoss: 0.0249,TrainAcc: 99.1917
+train Loss:0.0247 Acc:99.2120%
+Validating...
+valid Loss:0.0042 Acc:99.9200%
+Epoch 2/4
+--------------------------------------------------
+Training...
+Batch 500,TrainLoss: 0.0112,TrainAcc: 99.7000
+Batch 1000,TrainLoss: 0.0117,TrainAcc: 99.6500
+Batch 1500,TrainLoss: 0.0112,TrainAcc: 99.6750
+train Loss:0.0113 Acc:99.6720%
+Validating...
+valid Loss:0.0016 Acc:99.9800%
+Epoch 3/4
+--------------------------------------------------
+Training...
+Batch 500,TrainLoss: 0.0027,TrainAcc: 99.9875
+Batch 1000,TrainLoss: 0.0053,TrainAcc: 99.8625
+Batch 1500,TrainLoss: 0.0068,TrainAcc: 99.8208
+train Loss:0.0067 Acc:99.8200%
+Validating...
+valid Loss:0.0031 Acc:99.8600%
+Epoch 4/4
+--------------------------------------------------
+Training...
+Batch 500,TrainLoss: 0.0062,TrainAcc: 99.7750
+Batch 1000,TrainLoss: 0.0045,TrainAcc: 99.8375
+Batch 1500,TrainLoss: 0.0047,TrainAcc: 99.8417
+train Loss:0.0046 Acc:99.8440%
+Validating...
+valid Loss:0.0006 Acc:99.9800%
+1697.5576860904694
+总共训练了（28分钟）
+
+Process finished with exit code 0
