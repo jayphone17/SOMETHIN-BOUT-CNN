@@ -10,15 +10,15 @@
 
 在这里挖个坑。有空再回来看看。。
 
-<img src="/2222.jpg" alt="2222" style="zoom:50%;" />
+<img src="./2222.jpg" alt="2222" style="zoom:50%;" />
 
 ​																							+
 
-<img src="/3333.jpg" alt="3333" style="zoom: 50%;" />
+<img src="./3333.jpg" alt="3333" style="zoom: 50%;" />
 
 ​																							||
 
-<img src="/myplot2.png" alt="myplot2" style="zoom:67%;" />
+<img src="./myplot2.png" alt="myplot2" style="zoom:67%;" />
 
 
 
