@@ -18,20 +18,24 @@ import copy
 
 matplotlib_inline
 
+#图片变换
 transform = transforms.Compose([transforms.Resize([224,224]),
                                         transforms.ToTensor()])
 
+#数据加载
 def loading(path = None):
     img = Image.open(path)
     img = transform(img)
     img = img.unsqueeze(0)
     return img
 
+#将数据转移到cuda
 content_img = loading("3333.jpg")
 content_img = Variable(content_img).cuda()
 style_img = loading("2222.jpg")
 style_img = Variable(style_img).cuda()
 
+#内容图片损失
 class Content_loss(torch.nn.Module):
     def __init__(self, weight, target):
         #weight是权重参数，用来控制内容和风格对最后合成图像的影响程度
@@ -52,6 +56,12 @@ class Content_loss(torch.nn.Module):
         self.loss.backward(retain_graph = True)
         return self.loss
 
+# 格拉姆矩阵
+# CNN提取的风格是由数字组成的
+# 数字大小代表了图片中的风格的突出程度
+# Gram矩阵实矩阵的内积运算
+# 在运算过后输入到该矩阵的特征图的大的数字会变得更大（放大效果）
+# 放大的风格再参与损失计算，对合成的图片产生更大的影响
 
 class Gram_matrix(torch.nn.Module):
     # 实例参与风格损失的计算。
@@ -86,13 +96,12 @@ Use_gpu = torch.cuda.is_available()
 cnn = models.vgg16(pretrained = True).features
 
 if Use_gpu:
-    print("Using GPU for training!!!!! ")
-    print(torch.cuda.device_count())
-    print(torch.cuda.get_device_name(0))
     cnn = cnn.cuda()
 
 model = copy.deepcopy(cnn)
 
+# 指定在第三层卷积层提取内容， 在一、二、三、四层卷积层提取风格
+# why ？
 content_layer = ["Conv3"]
 style_layer = ["Conv_1", "Conv_2", "Conv_3", "Conv_4"]
 
@@ -108,15 +117,20 @@ gram = Gram_matrix()
 
 if Use_gpu:
     print("Using GPU for training!!!!! ")
-    print(torch.cuda.device_count())
-    print(torch.cuda.get_device_name(0))
+    print("显卡数量："+torch.cuda.device_count())
+    print("显卡型号："+torch.cuda.get_device_name(0))
     new_model = new_model.cuda()
     gram = gram.cuda()
 
 index = 1
 
 for layer in list(model)[:8]:
+    # 指明我们仅仅用到迁移模型特征提取部分卷积层前八层，因为内容提取和风格提取在前八层已经完成了
+
     if isinstance(layer, torch.nn.Conv2d):
+        # 然后建立一个空的模型
+        # 用torch.nn.Module 和 add_module 方法向空的模型中加入指定的层次模块
+
         name = "Conv_"+str(index)
         new_model.add_module(name,layer)
 
@@ -142,7 +156,10 @@ for layer in list(model)[:8]:
         name = "MaxPool_"+str(index)
         new_model.add_module(name,layer)
 
-#优化参数部分代码
+# 优化参数部分代码
+# 优化函数使用的是LBFGS
+# 因为这个模型需要优化的损失值有多个并且规模比较大
+
 input_img = content_img.clone()
 parameter = torch.nn.Parameter(input_img.data)
 optimizer = torch.optim.LBFGS([parameter])
