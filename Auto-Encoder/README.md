@@ -106,10 +106,36 @@ Process finished with exit code 0
 
 ```python
 # 训练结果
+downloading datasets
+finished downloading
+torch.Size([64, 1, 28, 28])
+[tensor(7), tensor(7), tensor(9), tensor(1)]
+Using GPU for training!!!!! 
+显卡数量：1
+显卡型号：NVIDIA GeForce RTX 2060
+Epoch: 0/5
+--------------------------------------------------
+Loss is : 0.0008
+Epoch: 1/5
+--------------------------------------------------
+Loss is : 0.0004
+Epoch: 2/5
+--------------------------------------------------
+Loss is : 0.0004
+Epoch: 3/5
+--------------------------------------------------
+Loss is : 0.0004
+Epoch: 4/5
+--------------------------------------------------
+Loss is : 0.0004
+Validation..........
 
+Process finished with exit code 0
 ```
 
-```python
-# 校验结果
+![](./img1.png)
+![](./X_test.png)
+![](./img2.png)
 
-```
+
+
