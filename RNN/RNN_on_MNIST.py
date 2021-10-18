@@ -5,8 +5,11 @@ from torch.autograd import Variable
 import matplotlib.pyplot as plt
 
 transform = transforms.Compose([transforms.ToTensor(),
-                                transforms.Lambda(lambda x: x.repeat(3,1,1)),
-                                transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+                                # transforms.Lambda(lambda x: x.repeat(3,1,1)),
+                                # 而是因为图片格式是灰度图只有一个channel，需要变成RGB图才可以
+                                # transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
+                                # transforms.Normalize((0.1307,), (0.3081,))
+                                transforms.Normalize([0.5],[0.5])
 ])
 
 print("downloading datasets")
@@ -52,10 +55,7 @@ class RNN(torch.nn.Module):
     # 隐藏层的输出代表input，128
 
   def forward(self, input):
-
-    print(input.shape)
     # torch.Size([192, 28, 28])
-
     output,_ = self.rnn(input,None)
     # H^0一般采用0初始化，所以H^0这里设置到None
     output = self.output(output[:,-1,:])
@@ -79,14 +79,7 @@ for epoch in range(epoch_n):
   # 训练集
   for data in data_loader_train:
     X_train, y_train = data
-
-    print(X_train.shape)
-    print(y_train.shape)
-
     X_train = X_train.view(-1,28,28)
-
-    print(X_train.shape)
-
     # 默认设置H^0为0，28x28的图片大小
     X_train, y_train = Variable(X_train), Variable(y_train)
     y_pred = model(X_train)
@@ -106,7 +99,6 @@ for epoch in range(epoch_n):
     outputs = model(X_test)
     _, pred = torch.max(outputs.data, 1)
     testing_correct += torch.sum(pred == y_test.data)
-
-print("Loss is: {:.4f}, Training Accuracy: {:.4f}%, Test Accuracy: {:.4f}"
+  print("Loss is: {:.4f}, Training Accuracy: {:.4f}%, Test Accuracy: {:.4f}"
       .format(running_loss/len(data_train), 100*running_correct/len(data_train),
               100*testing_correct/len(data_test)))

@@ -1,0 +1,32 @@
+Epoch 0/10
+--------------------------------------------------
+Loss is: 0.0125, Training Accuracy: 73.7283%, Test Accuracy: 87.9600
+Epoch 1/10
+--------------------------------------------------
+Loss is: 0.0057, Training Accuracy: 89.6400%, Test Accuracy: 92.0900
+Epoch 2/10
+--------------------------------------------------
+Loss is: 0.0041, Training Accuracy: 92.8783%, Test Accuracy: 94.6200
+Epoch 3/10
+--------------------------------------------------
+Loss is: 0.0035, Training Accuracy: 93.9000%, Test Accuracy: 94.9600
+Epoch 4/10
+--------------------------------------------------
+Loss is: 0.0030, Training Accuracy: 94.6867%, Test Accuracy: 94.8400
+Epoch 5/10
+--------------------------------------------------
+Loss is: 0.0027, Training Accuracy: 95.1567%, Test Accuracy: 95.0900
+Epoch 6/10
+--------------------------------------------------
+Loss is: 0.0025, Training Accuracy: 95.4983%, Test Accuracy: 95.7100
+Epoch 7/10
+--------------------------------------------------
+Loss is: 0.0024, Training Accuracy: 95.7817%, Test Accuracy: 96.0000
+Epoch 8/10
+--------------------------------------------------
+Loss is: 0.0023, Training Accuracy: 95.9833%, Test Accuracy: 95.1900
+Epoch 9/10
+--------------------------------------------------
+Loss is: 0.0022, Training Accuracy: 96.1233%, Test Accuracy: 95.6900
+
+Process finished with exit code 0
